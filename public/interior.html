@@ -45,12 +45,26 @@
     .masonry-item:hover img { transform: scale(1.04); }
 
     @media (max-width: 900px) { .masonry-gallery { column-count: 2; } }
+    @media (max-width: 700px) {
+      .site-header { padding: 0 12px; height: 56px; }
+      .logo-wrap video { height: 30px; }
+      .logo-text { font-size: 1rem; }
+      .logo-sub { display: none; }
+      .logo-wrap { gap: 8px; }
+      nav a { padding: 0 10px; font-size: 0.62rem; letter-spacing: 0.08em; height: 56px; }
+      nav a.cta { padding: 0 12px; height: 30px; font-size: 0.62rem; margin-left: 6px; }
+    }
+
     @media (max-width: 580px) {
       .masonry-gallery { column-count: 1; }
       .wrap { padding: 0 16px 40px; }
       .page-hero { padding: 40px 16px 20px; }
-      .site-header { padding: 0 16px; }
-      nav a:not(.cta) { display: none; }
+      .site-header { padding: 0 10px; height: 52px; }
+      .logo-wrap video { height: 26px; }
+      .logo-text { font-size: 0.88rem; }
+      .logo-wrap { gap: 6px; }
+      nav a { padding: 0 8px; font-size: 0.58rem; letter-spacing: 0.05em; height: 52px; border-left: none; }
+      nav a.cta { padding: 0 10px; height: 28px; margin-left: 4px; font-size: 0.58rem; }
     }
 
     .lightbox { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(10,8,6,0.95); z-index: 9000; padding: 20px; }
