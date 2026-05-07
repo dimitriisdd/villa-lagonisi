@@ -377,7 +377,7 @@ async function fetchAvailability() {
     const c = bookedRanges.length;
     const updated = data.updated ? new Date(data.updated).toLocaleTimeString('el-GR', { hour:'2-digit', minute:'2-digit' }) : '';
     dot.className  = 'avail-dot ok';
-    text.textContent = `✓ Ενημερωμένο${updated ? ' στις ' + updated : ''} — ${c} κράτηση${c !== 1 ? 'εις' : ''} βρέθηκε${c !== 1 ? 'ν' : ''}`;
+    text.textContent = `✓ Ενημερωμένο${updated ? ' στις ' + updated : ''} — ${c} ${c === 1 ? 'κράτηση βρέθηκε' : 'κρατήσεις βρέθηκαν'}`;
   } catch (err) {
     dot.className  = 'avail-dot err';
     text.textContent = '⚠ Αδυναμία φόρτωσης. Δοκιμάστε ανανέωση.';
