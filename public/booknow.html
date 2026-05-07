@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Villa Lagonisi — Κράτηση</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // ← Replace YOUR_PUBLIC_KEY with your EmailJS public key (Step 2)
+    emailjs.init('YOUR_PUBLIC_KEY');
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #f8f5f0; --warm-white: #fdfbf8;
+      --dark: #1a1713; --mid: #5c5449;
+      --gold: #b8956a; --gold-light: #d4b48a;
+      --line: rgba(26,23,19,0.1);
+      --booked: #f0dede; --booked-text: #9b4f4f;
+      --selected: #b8956a; --in-range: #f5ece0;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--warm-white); color: var(--dark); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
+
+    /* PRELOADER */
+    #preloader { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.8s ease; }
+    #preloader video { width: 160px; }
+
+    /* HEADER */
+    .site-header { position: sticky; top: 0; z-index: 100; background: var(--warm-white); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 70px; }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
+    .logo-wrap video { height: 46px; width: auto; }
+    .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 400; letter-spacing: 0.06em; color: var(--dark); }
+    .logo-sub { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mid); display: block; line-height: 1; }
+    nav { display: flex; align-items: center; }
+    nav a { padding: 0 20px; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); text-decoration: none; font-weight: 400; transition: color 0.25s; border-left: 1px solid var(--line); height: 70px; display: flex; align-items: center; }
+    nav a:hover { color: var(--gold); }
+    nav a.active { color: var(--dark); font-weight: 500; }
+
+    @media (max-width: 700px) {
+      .site-header { padding: 0 12px; height: 56px; }
+      .logo-wrap video { height: 30px; }
+      .logo-text { font-size: 1rem; }
+      .logo-sub { display: none; }
+      .logo-wrap { gap: 8px; }
+      nav a { padding: 0 10px; font-size: 0.62rem; letter-spacing: 0.08em; height: 56px; }
+      nav a.cta { padding: 0 12px; height: 30px; font-size: 0.62rem; margin-left: 6px; }
+    }
+
+    @media (max-width: 580px) {
+      .site-header { padding: 0 10px; height: 52px; }
+      .logo-wrap video { height: 26px; }
+      .logo-text { font-size: 0.88rem; }
+      .logo-wrap { gap: 6px; }
+      nav a { padding: 0 8px; font-size: 0.58rem; letter-spacing: 0.05em; height: 52px; border-left: none; }
+      nav a.cta { padding: 0 10px; height: 28px; margin-left: 4px; font-size: 0.58rem; }
+    }
+
+    /* HERO */
+    .book-hero { background: var(--dark); padding: 70px 40px 60px; text-align: center; position: relative; overflow: hidden; }
+    .book-hero::before { content: ''; position: absolute; inset: 0; background: url("VILLALAGO/1739642107391.jpg") center/cover no-repeat; opacity: 0.18; }
+    .book-hero-inner { position: relative; z-index: 1; }
+    .book-hero-label { font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .book-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 300; color: #fff; line-height: 1.1; }
+    .book-hero h1 em { font-style: italic; color: var(--gold-light); }
+    .book-hero p { margin-top: 14px; color: rgba(255,255,255,0.55); font-size: 0.93rem; max-width: 48ch; margin-inline: auto; line-height: 1.7; }
+
+    /* PAGE */
+    .page-wrap { max-width: 1260px; margin: 0 auto; padding: 50px 40px 80px; }
+    @media (max-width: 700px) { .page-wrap { padding: 30px 16px 60px; } }
+
+    /* AVAILABILITY STATUS BAR */
+    .avail-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--cream); border: 1px solid var(--line); border-radius: 5px;
+      padding: 13px 20px; margin-bottom: 28px; font-size: 0.82rem;
+    }
+    .avail-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: background 0.4s; }
+    .avail-dot.loading { background: var(--gold); animation: pulse 1s infinite; }
+    .avail-dot.ok  { background: #5a8a5a; }
+    .avail-dot.err { background: #9b4f4f; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .avail-text { color: var(--mid); }
+    .avail-refresh {
+      margin-left: auto; background: none; border: 1px solid var(--line); border-radius: 3px;
+      padding: 6px 14px; font-family: 'Jost', sans-serif; font-size: 0.72rem;
+      letter-spacing: 0.1em; cursor: pointer; color: var(--mid); transition: 0.2s;
+    }
+    .avail-refresh:hover { border-color: var(--gold); color: var(--gold); }
+    .avail-refresh:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* SECTION LABEL */
+    .section-label { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+    /* CALENDAR */
+    .cal-outer { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 6px 32px rgba(26,23,19,0.07); }
+    .cal-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 18px 28px; border-bottom: 1px solid var(--line); background: var(--cream); }
+    .cal-nav { display: flex; align-items: center; gap: 8px; }
+    .cal-nav-btn { background: #fff; border: 1px solid var(--line); border-radius: 3px; width: 38px; height: 38px; cursor: pointer; color: var(--mid); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, color 0.2s; }
+    .cal-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .cal-range-label { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; min-width: 260px; text-align: center; }
+    .cal-legend { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--mid); }
+    .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+    .legend-swatch.avail { background: #fff; border: 1.5px solid #ddd; }
+    .legend-swatch.booked { background: var(--booked); }
+    .legend-swatch.sel { background: var(--selected); }
+    .legend-swatch.range { background: var(--in-range); border: 1px solid var(--gold-light); }
+
+    .cal-months-wrap { display: grid; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 740px) { .cal-months-wrap { grid-template-columns: 1fr; } }
+
+    .cal-month { padding: 28px 32px 32px; border-right: 1px solid var(--line); }
+    .cal-month:last-child { border-right: none; }
+    .cal-month-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; margin-bottom: 18px; }
+    .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 6px; }
+    .cal-weekday { text-align: center; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); padding: 4px 0; }
+    .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+
+    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 0.9rem; cursor: pointer; transition: background 0.12s, color 0.12s; position: relative; user-select: none; }
+    .cal-day:hover:not(.booked):not(.past):not(.empty) { background: var(--in-range); }
+    .cal-day.empty { cursor: default; pointer-events: none; }
+    .cal-day.past { color: #d0cbc4; cursor: not-allowed; }
+    .cal-day.today { font-weight: 500; }
+    .cal-day.today::before { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
+    .cal-day.booked { background: var(--booked); color: var(--booked-text); cursor: not-allowed; font-size: 0.82rem; }
+    .cal-day.booked::after { content: '✕'; position: absolute; top: 1px; right: 3px; font-size: 0.5rem; opacity: 0.35; }
+    .cal-day.sel-start, .cal-day.sel-end { background: var(--selected) !important; color: #fff !important; font-weight: 500; z-index: 1; }
+    .cal-day.in-range { background: var(--in-range); border-radius: 0; }
+    .cal-day.sel-start { border-radius: 4px 0 0 4px; }
+    .cal-day.sel-end { border-radius: 0 4px 4px 0; }
+    .cal-day.sel-start.sel-end { border-radius: 4px; }
+
+    /* SELECTION SUMMARY */
+    .sel-summary { background: var(--dark); color: #fff; border-radius: 5px; padding: 16px 24px; margin-bottom: 36px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .sel-summary.hidden { display: none; }
+    .sel-dates { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; }
+    .sel-nights { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-top: 3px; }
+    .sel-clear { background: none; border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.55); border-radius: 3px; padding: 8px 16px; font-size: 0.7rem; letter-spacing: 0.12em; cursor: pointer; transition: 0.2s; }
+    .sel-clear:hover { border-color: var(--gold); color: var(--gold-light); }
+
+    /* BOOKING GRID */
+    .booking-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 44px; align-items: start; }
+    @media (max-width: 860px) { .booking-grid { grid-template-columns: 1fr; gap: 28px; } }
+
+    .prop-photo { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; margin-bottom: 22px; }
+    .prop-name { font-family: 'Cormorant Garamond', serif; font-size: 1.85rem; font-weight: 400; margin-bottom: 4px; }
+    .prop-loc { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid); margin-bottom: 22px; }
+    .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+    .spec-item { background: var(--warm-white); padding: 14px 16px; }
+    .spec-label { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mid); }
+    .spec-value { font-size: 0.95rem; font-weight: 500; margin-top: 3px; }
+    .amenities { display: flex; flex-wrap: wrap; gap: 7px; }
+    .amenity { border: 1px solid var(--line); border-radius: 2px; padding: 6px 12px; font-size: 0.76rem; color: var(--mid); }
+
+    /* FORM */
+    .booking-form-panel { background: var(--dark); border-radius: 5px; padding: 32px 28px; color: rgba(255,255,255,0.85); position: sticky; top: 90px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.67rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.42); margin-bottom: 7px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.11); border-radius: 3px; color: #fff; padding: 12px 13px; font-family: 'Jost', sans-serif; font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+    .form-group select option { background: #222; }
+    .form-group input[readonly] { opacity: 0.65; cursor: default; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-note { font-size: 0.74rem; color: rgba(255,255,255,0.28); line-height: 1.65; margin-bottom: 16px; padding: 11px 13px; border: 1px solid rgba(255,255,255,0.07); border-radius: 3px; background: rgba(255,255,255,0.035); }
+    .form-note strong { color: rgba(255,255,255,0.52); font-weight: 400; }
+    .btn-submit { width: 100%; background: var(--gold); color: var(--dark); border: none; border-radius: 3px; padding: 15px; font-family: 'Jost', sans-serif; font-size: 0.77rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.25s, transform 0.15s; }
+    .btn-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .or-divider { text-align: center; margin: 16px 0; font-size: 0.67rem; letter-spacing: 0.14em; color: rgba(255,255,255,0.2); position: relative; }
+    .or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 38%; height: 1px; background: rgba(255,255,255,0.08); }
+    .or-divider::before { left: 0; } .or-divider::after { right: 0; }
+    .contact-links { display: flex; flex-direction: column; gap: 9px; }
+    .contact-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.09); border-radius: 3px; text-decoration: none; color: rgba(255,255,255,0.62); font-size: 0.84rem; transition: border-color 0.2s, color 0.2s; }
+    .contact-link:hover { border-color: var(--gold); color: var(--gold-light); }
+    #form-success { display: none; margin-top: 12px; padding: 13px 15px; background: rgba(184,149,106,0.14); border: 1px solid var(--gold); border-radius: 3px; font-size: 0.82rem; color: var(--gold-light); line-height: 1.6; text-align: center; }
+
+    footer { background: var(--dark); color: rgba(255,255,255,0.35); text-align: center; padding: 36px 20px; font-size: 0.76rem; letter-spacing: 0.12em; border-top: 1px solid rgba(255,255,255,0.06); }
+    footer a { color: var(--gold-light); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<div id="preloader"><video autoplay muted loop playsinline><source src="VL.mp4" type="video/mp4"></video></div>
+
+<div id="content" style="display:none;">
+
+  <header class="site-header">
+    <a href="index.html" class="logo-wrap">
+      <video src="VL.mp4" autoplay muted loop playsinline></video>
+      <div>
+        <span class="logo-text">Villa Lagonisi</span>
+        <span class="logo-sub">Private Luxury Villa</span>
+      </div>
+    </a>
+    <nav>
+      <a href="index.html">Εξωτερικός Χώρος</a>
+      <a href="interior.html">Εσωτερικός Χώρος</a>
+      <a href="booknow.html" class="active">Κράτηση</a>
+    </nav>
+  </header>
+
+  <div class="book-hero">
+    <div class="book-hero-inner">
+      <div class="book-hero-label">Διαθεσιμότητα & Κράτηση</div>
+      <h1>Κλείστε τη<br><em>διαμονή σας</em></h1>
+      <p>Επιλέξτε ημερομηνίες από το ημερολόγιο. Οι επισημασμένες ημέρες είναι ήδη κλεισμένες.</p>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- Availability status bar — no URL visible to users -->
+    <div class="avail-bar">
+      <div class="avail-dot loading" id="avail-dot"></div>
+      <span class="avail-text" id="avail-text">Φόρτωση διαθεσιμότητας...</span>
+      <button class="avail-refresh" id="avail-refresh" onclick="fetchAvailability()" disabled>↻ Ανανέωση</button>
+    </div>
+
+    <!-- Calendar -->
+    <div class="section-label">Ημερολόγιο Διαθεσιμότητας</div>
+
+    <div class="cal-outer">
+      <div class="cal-toolbar">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="shiftMonths(-1)">&#8592;</button>
+          <span class="cal-range-label" id="cal-range-label"></span>
+          <button class="cal-nav-btn" onclick="shiftMonths(1)">&#8594;</button>
+        </div>
+        <div class="cal-legend">
+          <div class="legend-item"><div class="legend-swatch avail"></div>Διαθέσιμη</div>
+          <div class="legend-item"><div class="legend-swatch booked"></div>Κλεισμένη</div>
+          <div class="legend-item"><div class="legend-swatch sel"></div>Επιλεγμένη</div>
+          <div class="legend-item"><div class="legend-swatch range"></div>Περίοδος</div>
+        </div>
+      </div>
+      <div class="cal-months-wrap" id="cal-months-wrap"></div>
+    </div>
+
+    <!-- Selection summary -->
+    <div class="sel-summary hidden" id="sel-summary">
+      <div>
+        <div class="sel-dates" id="sel-dates-text"></div>
+        <div class="sel-nights" id="sel-nights-text"></div>
+      </div>
+      <button class="sel-clear" onclick="clearSel()">✕ Εκκαθάριση</button>
+    </div>
+
+    <!-- Booking form + property -->
+    <div class="section-label">Φόρμα Κράτησης</div>
+
+    <div class="booking-grid">
+
+      <div>
+        <img class="prop-photo" src="VILLALAGO/1739642107467.jpg" alt="Villa Lagonisi">
+        <div class="prop-name">Villa Lagonisi</div>
+        <div class="prop-loc">🌊 Λαγονήσι, Αττική</div>
+        <div class="specs-grid">
+          <div class="spec-item"><div class="spec-label">Φιλοξενία</div><div class="spec-value">4 Άτομα</div></div>
+          <div class="spec-item"><div class="spec-label">Πισίνα</div><div class="spec-value">Ιδιωτική</div></div>
+          <div class="spec-item"><div class="spec-label">Jacuzzi</div><div class="spec-value">Ναι</div></div>
+          <div class="spec-item"><div class="spec-label">Ιδιωτικότητα</div><div class="spec-value">100% Περιφραγμένο</div></div>
+        </div>
+        <div class="amenities">
+          <div class="amenity">🏊 Ιδιωτική Πισίνα</div>
+          <div class="amenity">🛁 Υδρομασάζ</div>
+          <div class="amenity">🌿 Κήπος</div>
+          <div class="amenity">🅿️ Parking</div>
+          <div class="amenity">❄️ A/C</div>
+          <div class="amenity">📶 Wi-Fi</div>
+          <div class="amenity">🔒 Ασφάλεια</div>
+          <div class="amenity">🌅 Ήσυχη Τοποθεσία</div>
+        </div>
+      </div>
+
+      <div class="booking-form-panel">
+        <div class="form-note">
+          <strong>Πώς λειτουργεί:</strong> Συμπληρώστε τη φόρμα και θα επικοινωνήσουμε μαζί σας εντός 24 ωρών για επιβεβαίωση και πληρωμή.
+        </div>
+        <div class="form-group">
+          <label>Ονοματεπώνυμο *</label>
+          <input type="text" id="f-name" placeholder="π.χ. Γιώργος Παπαδόπουλος">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="f-email" placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label>Τηλέφωνο</label>
+            <input type="tel" id="f-phone" placeholder="+30 6900 000000">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Άφιξη *</label>
+            <input type="text" id="f-checkin" placeholder="Επιλέξτε από ημερολόγιο" readonly>
+          </div>
+          <div class="form-group">
+            <label>Αναχώρηση *</label>
+            <input type="text" id="f-checkout" placeholder="Επιλέξτε από ημερολόγιο" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Αριθμός Επισκεπτών *</label>
+          <select id="f-guests">
+            <option value="">Επιλέξτε...</option>
+            <option>1 Άτομο</option>
+            <option>2 Άτομα</option>
+            <option>3 Άτομα</option>
+            <option>4 Άτομα (Μέγιστο)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Μήνυμα (προαιρετικό)</label>
+          <textarea id="f-msg" rows="3" placeholder="Ειδικές απαιτήσεις, ερωτήσεις..."></textarea>
+        </div>
+        <button class="btn-submit" onclick="submitRequest()">Αποστολή Αιτήματος Κράτησης →</button>
+        <div id="form-success">✓ Το αίτημά σας εστάλη! Θα επικοινωνήσουμε σύντομα.</div>
+        <div class="or-divider">ή επικοινωνήστε απευθείας</div>
+        <div class="contact-links">
+          <a href="tel:+306937297848" class="contact-link"><span>📞</span> 693 729 7848</a>
+          <a href="https://wa.me/306937297848" class="contact-link" target="_blank"><span>💬</span> WhatsApp</a>
+          <a href="mailto:villa-lagonisi@hotmail.com" class="contact-link"><span>✉️</span> villa-lagonisi@hotmail.com</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Villa Lagonisi — All Rights Reserved &nbsp;|&nbsp;
+    <a href="index.html">Εξωτερικός Χώρος</a> &nbsp;|&nbsp;
+    <a href="interior.html">Εσωτερικός Χώρος</a>
+  </footer>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let bookedRanges = []; // [{start: Date, end: Date}]
+let selStart = null, selEnd = null, hoverDate = null;
+let calBase = (() => { const d = new Date(); d.setDate(1); return d; })();
+
+const MONTHS_EL = ['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος',
+                   'Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'];
+
+// ============================================================
+// FETCH AVAILABILITY FROM BACKEND
+// ============================================================
+async function fetchAvailability() {
+  const dot  = document.getElementById('avail-dot');
+  const text = document.getElementById('avail-text');
+  const btn  = document.getElementById('avail-refresh');
+
+  dot.className  = 'avail-dot loading';
+  text.textContent = 'Φόρτωση διαθεσιμότητας...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/availability', { signal: AbortSignal.timeout(12000) });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+    const data = await res.json();
+
+    // Convert date strings to Date objects
+    bookedRanges = (data.ranges || []).map(r => ({
+      start: parseYMD(r.start),
+      end:   parseYMD(r.end),
+    }));
+
+    renderCalendar();
+
+    const c = bookedRanges.length;
+    const updated = data.updated ? new Date(data.updated).toLocaleTimeString('el-GR', { hour:'2-digit', minute:'2-digit' }) : '';
+    dot.className  = 'avail-dot ok';
+    text.textContent = `✓ Ενημερωμένο${updated ? ' στις ' + updated : ''} — ${c} κράτηση${c !== 1 ? 'εις' : ''} βρέθηκε${c !== 1 ? 'ν' : ''}`;
+  } catch (err) {
+    dot.className  = 'avail-dot err';
+    text.textContent = '⚠ Αδυναμία φόρτωσης. Δοκιμάστε ανανέωση.';
+    console.error('Availability fetch failed:', err);
+  }
+
+  btn.disabled = false;
+}
+
+function parseYMD(s) {
+  // s = "YYYY-MM-DD"
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function midnight(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+function isBooked(date) {
+  const d = midnight(date);
+  for (const r of bookedRanges) { if (d >= r.start && d < r.end) return true; }
+  return false;
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('el-GR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+// ============================================================
+// CALENDAR RENDER
+// ============================================================
+function renderCalendar() {
+  const wrap = document.getElementById('cal-months-wrap');
+  wrap.innerHTML = '';
+
+  const m1 = new Date(calBase.getFullYear(), calBase.getMonth(), 1);
+  const m2 = new Date(calBase.getFullYear(), calBase.getMonth() + 1, 1);
+
+  document.getElementById('cal-range-label').textContent =
+    `${MONTHS_EL[m1.getMonth()]} ${m1.getFullYear()}  —  ${MONTHS_EL[m2.getMonth()]} ${m2.getFullYear()}`;
+
+  wrap.appendChild(buildMonth(m1));
+  wrap.appendChild(buildMonth(m2));
+}
+
+function buildMonth(firstDay) {
+  const year = firstDay.getFullYear(), month = firstDay.getMonth();
+  const today = midnight(new Date());
+
+  const div = document.createElement('div');
+  div.className = 'cal-month';
+
+  const title = document.createElement('div');
+  title.className = 'cal-month-title';
+  title.textContent = `${MONTHS_EL[month]} ${year}`;
+  div.appendChild(title);
+
+  const wdh = document.createElement('div');
+  wdh.className = 'cal-weekdays';
+  ['Δε','Τρ','Τε','Πε','Πα','Σά','Κυ'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-weekday';
+    el.textContent = d;
+    wdh.appendChild(el);
+  });
+  div.appendChild(wdh);
+
+  const grid = document.createElement('div');
+  grid.className = 'cal-days';
+
+  const startWd = (firstDay.getDay() + 6) % 7;
+  for (let i = 0; i < startWd; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day empty';
+    grid.appendChild(e);
+  }
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = midnight(new Date(year, month, d));
+    const cell = document.createElement('div');
+    cell.className = 'cal-day';
+    cell.textContent = d;
+
+    if (date.getTime() === today.getTime()) cell.classList.add('today');
+
+    if (date < today) {
+      cell.classList.add('past');
+    } else if (isBooked(date)) {
+      cell.classList.add('booked');
+      cell.title = 'Κλεισμένη';
+    } else {
+      const t = date.getTime();
+      const isStart   = selStart && t === selStart.getTime();
+      const isEnd     = selEnd   && t === selEnd.getTime();
+      const inRange   = selStart && selEnd && date > selStart && date < selEnd;
+      const inHover   = selStart && !selEnd && hoverDate && date > selStart && date <= hoverDate;
+
+      if (isStart) cell.classList.add('sel-start');
+      if (isEnd)   cell.classList.add('sel-end');
+      if (inRange || inHover) cell.classList.add('in-range');
+
+      cell.addEventListener('click', () => onDayClick(date));
+      cell.addEventListener('mouseenter', () => {
+        if (selStart && !selEnd) { hoverDate = date; renderCalendar(); }
+      });
+    }
+
+    grid.appendChild(cell);
+  }
+
+  div.appendChild(grid);
+  return div;
+}
+
+function shiftMonths(d) {
+  calBase = new Date(calBase.getFullYear(), calBase.getMonth() + d, 1);
+  renderCalendar();
+}
+
+// ============================================================
+// SELECTION
+// ============================================================
+function onDayClick(date) {
+  if (!selStart || (selStart && selEnd)) {
+    selStart = date; selEnd = null; hoverDate = null;
+  } else {
+    if (date <= selStart) { selStart = date; selEnd = null; }
+    else {
+      let cur = new Date(selStart); cur.setDate(cur.getDate() + 1);
+      while (cur < date) {
+        if (isBooked(cur)) {
+          alert('Υπάρχουν κλεισμένες ημέρες στην επιλεγμένη περίοδο.\nΠαρακαλώ επιλέξτε διαφορετικές ημερομηνίες.');
+          return;
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+      selEnd = date; hoverDate = null;
+      syncFormDates(); updateSummary();
+    }
+  }
+  renderCalendar();
+}
+
+function clearSel() {
+  selStart = null; selEnd = null; hoverDate = null;
+  document.getElementById('f-checkin').value = '';
+  document.getElementById('f-checkout').value = '';
+  document.getElementById('sel-summary').classList.add('hidden');
+  renderCalendar();
+}
+
+function syncFormDates() {
+  if (!selStart || !selEnd) return;
+  document.getElementById('f-checkin').value  = fmtDate(selStart);
+  document.getElementById('f-checkout').value = fmtDate(selEnd);
+}
+
+function updateSummary() {
+  if (!selStart || !selEnd) return;
+  const nights = Math.round((selEnd - selStart) / 86400000);
+  document.getElementById('sel-dates-text').textContent = `${fmtDate(selStart)}  →  ${fmtDate(selEnd)}`;
+  document.getElementById('sel-nights-text').textContent = `${nights} διανυκτέρευση${nights !== 1 ? 'εις' : ''}`;
+  document.getElementById('sel-summary').classList.remove('hidden');
+}
+
+// ============================================================
+// FORM SUBMIT — via EmailJS
+// ============================================================
+async function submitRequest() {
+  const name     = document.getElementById('f-name').value.trim();
+  const email    = document.getElementById('f-email').value.trim();
+  const checkin  = document.getElementById('f-checkin').value;
+  const checkout = document.getElementById('f-checkout').value;
+  const guests   = document.getElementById('f-guests').value;
+
+  if (!name || !email || !checkin || !checkout || !guests) {
+    alert('Παρακαλώ συμπληρώστε όλα τα υποχρεωτικά πεδία (*).');
+    return;
+  }
+
+  const phone = document.getElementById('f-phone').value;
+  const msg   = document.getElementById('f-msg').value;
+
+  const btn = document.querySelector('.btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Αποστολή...';
+
+  try {
+    await emailjs.send(
+      'YOUR_SERVICE_ID',    // ← replace after setup (Step 3)
+      'YOUR_TEMPLATE_ID',   // ← replace after setup (Step 4)
+      {
+        from_name:   name,
+        from_email:  email,
+        phone:       phone || '—',
+        checkin:     checkin,
+        checkout:    checkout,
+        guests:      guests,
+        message:     msg || '—',
+        to_email:    'villa-lagonisi@hotmail.com',
+      }
+    );
+
+    document.getElementById('form-success').style.display = 'block';
+    btn.textContent = '✓ Εστάλη';
+
+    // Clear the form
+    ['f-name','f-email','f-phone','f-msg'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-guests').value = '';
+    clearSel();
+
+  } catch (err) {
+    console.error('EmailJS error:', err);
+    alert('Σφάλμα αποστολής. Παρακαλώ επικοινωνήστε τηλεφωνικά ή μέσω WhatsApp.');
+    btn.disabled = false;
+    btn.textContent = 'Αποστολή Αιτήματος Κράτησης →';
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', () => {
+  const pre = document.getElementById('preloader'), con = document.getElementById('content');
+  setTimeout(() => {
+    pre.style.opacity = '0';
+    setTimeout(() => { pre.style.display = 'none'; con.style.display = 'block'; }, 800);
+  }, 1200);
+
+  renderCalendar();
+  fetchAvailability(); // silent, automatic on load
+
+  document.getElementById('cal-months-wrap').addEventListener('mouseleave', () => {
+    if (selStart && !selEnd && hoverDate) { hoverDate = null; renderCalendar(); }
+  });
+});
+</script>
+</body>
+</html>
