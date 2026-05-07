@@ -463,6 +463,7 @@ function buildMonth(firstDay) {
     const cell = document.createElement('div');
     cell.className = 'cal-day';
     cell.textContent = d;
+    cell.dataset.ts = date.getTime();
 
     if (date.getTime() === today.getTime()) cell.classList.add('today');
 
@@ -476,15 +477,14 @@ function buildMonth(firstDay) {
       const isStart   = selStart && t === selStart.getTime();
       const isEnd     = selEnd   && t === selEnd.getTime();
       const inRange   = selStart && selEnd && date > selStart && date < selEnd;
-      const inHover   = selStart && !selEnd && hoverDate && date > selStart && date <= hoverDate;
 
       if (isStart) cell.classList.add('sel-start');
       if (isEnd)   cell.classList.add('sel-end');
-      if (inRange || inHover) cell.classList.add('in-range');
+      if (inRange) cell.classList.add('in-range');
 
       cell.addEventListener('click', () => onDayClick(date));
       cell.addEventListener('mouseenter', () => {
-        if (selStart && !selEnd) { hoverDate = date; renderCalendar(); }
+        if (selStart && !selEnd) { hoverDate = date; updateHoverClasses(); }
       });
     }
 
@@ -498,6 +498,19 @@ function buildMonth(firstDay) {
 function shiftMonths(d) {
   calBase = new Date(calBase.getFullYear(), calBase.getMonth() + d, 1);
   renderCalendar();
+}
+
+// Updates only the in-range highlight on hover — never rebuilds DOM
+function updateHoverClasses() {
+  document.querySelectorAll('.cal-day').forEach(cell => {
+    cell.classList.remove('in-range');
+  });
+  if (!selStart || selEnd || !hoverDate) return;
+  document.querySelectorAll('.cal-day[data-ts]').forEach(cell => {
+    const ts = parseInt(cell.dataset.ts);
+    const d = new Date(ts);
+    if (d > selStart && d <= hoverDate) cell.classList.add('in-range');
+  });
 }
 
 // ============================================================
@@ -570,8 +583,8 @@ async function submitRequest() {
 
   try {
     await emailjs.send(
-      'service_ip0la7l',    // ← replace after setup (Step 3)
-      'template_984ffdm',   // ← replace after setup (Step 4)
+      'YOUR_SERVICE_ID',    // ← replace after setup (Step 3)
+      'YOUR_TEMPLATE_ID',   // ← replace after setup (Step 4)
       {
         from_name:   name,
         from_email:  email,
@@ -614,7 +627,7 @@ window.addEventListener('load', () => {
   fetchAvailability(); // silent, automatic on load
 
   document.getElementById('cal-months-wrap').addEventListener('mouseleave', () => {
-    if (selStart && !selEnd && hoverDate) { hoverDate = null; renderCalendar(); }
+    if (selStart && !selEnd && hoverDate) { hoverDate = null; updateHoverClasses(); }
   });
 });
 </script>
