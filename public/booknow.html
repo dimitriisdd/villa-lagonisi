@@ -267,7 +267,7 @@
           </div>
           <div class="form-group">
             <label>Τηλέφωνο</label>
-            <input type="tel" id="f-phone" placeholder="+30 6900 000000">
+            <input type="tel" id="f-phone" placeholder="+30 6900000000">
           </div>
         </div>
         <div class="form-row">
@@ -298,9 +298,9 @@
         <div id="form-success">✓ Το αίτημά σας εστάλη! Θα επικοινωνήσουμε σύντομα.</div>
         <div class="or-divider">ή επικοινωνήστε απευθείας</div>
         <div class="contact-links">
-          <a href="tel:+306900000000" class="contact-link"><span>📞</span> Τηλεφωνική Επικοινωνία</a>
+          <a href="tel:+306937297848" class="contact-link"><span>📞</span> Τηλεφωνική Επικοινωνία</a>
           <a href="https://wa.me/306900000000" class="contact-link" target="_blank"><span>💬</span> WhatsApp</a>
-          <a href="mailto:info@villalagonisi.gr" class="contact-link"><span>✉️</span> info@villalagonisi.gr</a>
+          <a href="mailto:" class="contact-link"><span>✉️</span> info@villalagonisi.gr</a>
         </div>
       </div>
 
@@ -354,7 +354,7 @@ async function fetchAvailability() {
     const c = bookedRanges.length;
     const updated = data.updated ? new Date(data.updated).toLocaleTimeString('el-GR', { hour:'2-digit', minute:'2-digit' }) : '';
     dot.className  = 'avail-dot ok';
-    text.textContent = `✓ Ενημερωμένο${updated ? ' στις ' + updated : ''} — ${c} κράτηση${c !== 1 ? 'εις' : ''} βρέθηκε${c !== 1 ? 'ν' : ''}`;
+    text.textContent = `✓ Ενημερωμένο${updated ? ' στις ' + updated : ''} — ${c} ${c === 1 ? 'κράτηση βρέθηκε' : 'κρατήσεις βρέθηκαν'}`;
   } catch (err) {
     dot.className  = 'avail-dot err';
     text.textContent = '⚠ Αδυναμία φόρτωσης. Δοκιμάστε ανανέωση.';
